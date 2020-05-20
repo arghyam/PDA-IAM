@@ -1,0 +1,53 @@
+DROP TABLE IF EXISTS User;
+CREATE TABLE User (
+user_id varchar(100) PRIMARY KEY NOT NULL,
+username varchar(100) NOT NULL,
+firstname varchar(100) NOT NULL,
+lastname varchar(100),
+email varchar(100) NOT NULL,
+salutation varchar(2) NOT NULL,
+photo varchar(200) NOT NULL,
+crteDttm DATE NOT NULL,
+updtDttm DATE NOT NULL);
+
+DROP TABLE IF EXISTS Session;
+CREATE TABLE Session (
+  session_id varchar(100) PRIMARY KEY NOT NULL,
+  session_name varchar(100) NOT NULL,
+  training_org varchar(100),
+  course_name varchar(100),
+  course_description varchar(500),
+  resourceList BLOB,
+  startDate DATE NOT NULL,
+  endDate DATE NOT NULL,
+  crteDttm DATE NOT NULL,
+  updtDttm DATE NOT NULL);
+
+DROP TABLE IF EXISTS Role;
+CREATE TABLE Role (
+  role_id int PRIMARY KEY NOT NULL,
+  role_name varchar(50) NOT NULL,
+  role_description varchar(200),
+  crteDttm DATE NOT NULL,
+  updtDttm DATE NOT NULL);
+
+DROP TABLE IF EXISTS Session_Role;
+CREATE TABLE Session_Role (
+session_role_id varchar(100) PRIMARY KEY NOT NULL,
+session_id varchar(100) NOT NULL,
+user_id varchar(100) NOT NULL,
+role_id int NOT NULL,
+crteDttm DATE NOT NULL,
+updtDttm DATE NOT NULL,
+FOREIGN KEY (user_id) REFERENCES User(user_id),
+FOREIGN KEY (role_id) REFERENCES Role(role_id));
+
+DROP TABLE IF EXISTS Session_Consumption;
+CREATE TABLE Session_Consumption (
+  Session_consumption_id varchar(100) PRIMARY KEY NOT NULL,
+  user_id varchar(100) NOT NULL,
+  session_id varchar(100) NOT NULL,
+  attestion varchar(300) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES User(user_id),
+  FOREIGN KEY (session_id) REFERENCES Session(session_id));
+commit;

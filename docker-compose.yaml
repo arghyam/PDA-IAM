@@ -1,0 +1,16 @@
+version: '2'
+services:
+        iam:
+                image: iam:v6
+                ports:
+                        - "9090:9090"
+                expose:
+                        - 9090
+                environment:
+                        - sso_publickey=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnPrKlAPXn57QWKwC9Xl5HSRBYPPdgN3RwrCKQN/qqnUVN6VvygohaI07kqg+NX46z0ksnA2C94GkWsQlz7OoMg3SljUr2FVBUw1UsSHcSH0IaGKGXmE9lVA9IpVSFXD51ZYOLOH7s0/wIR8iYWenh/BwgOaICC6uZdvZ3DUEqcErIhbkuN8cAGXyERRBkt32JBOXAyl3A6VphHvRkYpgHz8EdhwCcff7B6CwL/4M3P9PcbzceflKSw9f7i1ME3vF2MSdawmS7uJyMLKjdV8Q1VGGKyFfeG13PHhOMjGgDaASdORPWmiTTGF3KfurjmYYfc6pd3lE+0jk/+p9sGJ7qQIDAQAB
+
+networks:
+        webproxy:
+                driver: bridge
+
+

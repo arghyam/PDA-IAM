@@ -1,0 +1,62 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/iam-app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 10 days' worth of history -->
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <property name="spring.application.name" value="service" scope="context"/>
+    <!--<appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:9600</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>-->
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
+    <appender name="STASH-B" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>54.221.160.53:9600</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder" >
+            <providers>
+                <timestamp/>
+                <version/>
+                <loggerName/>
+                <pattern>
+                    <pattern>
+                        {
+                        "custom_constant": "cfg",
+                        "level": "%level",
+                        "thread": "%thread",
+                        "message": "%message"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+    </appender>
+
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="com.socion.backend" level="DEBUG"/>
+
+    <root level="INFO" additivity="FALSE">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STASH-B" />
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
+

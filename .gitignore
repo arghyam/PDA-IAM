@@ -1,0 +1,39 @@
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+##Project##
+#application.properties
+FutureTest.java
+RedisTestClient.java
+*.log
+AWSS3Test.java
+TestDecryptPassword.java
+ImageToBase64Test.java
+./logFile.*
+nohup.out
+src/main/resources/application.properties
+./src/main/resources/application.properties
