@@ -158,6 +158,9 @@ public class AppContext {
     @Value("${email-update-unsuccessful}")
     private String emailUpdateUnSuccessFul;
 
+    @Value("${keycloak-public-key}")
+    private String keycloakPublickey;
+
     public String getSmtpAuth() {
         return smtpAuth;
     }
@@ -565,5 +568,13 @@ public class AppContext {
 
     public void setEmailUpdateUnSuccessFul(String emailUpdateUnSuccessFul) {
         this.emailUpdateUnSuccessFul = emailUpdateUnSuccessFul;
+    }
+
+    public String getKeycloakPublickey() {
+        return keycloakPublickey;
+    }
+
+    public void setKeycloakPublickey(String keycloakPublickey) {
+        this.keycloakPublickey = keycloakPublickey;
     }
 }

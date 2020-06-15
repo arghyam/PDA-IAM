@@ -84,7 +84,7 @@ public class LoginController {
         ResponseDTO responseDTO = new ResponseDTO();
         try {
             responseDTO = loginV2Service.changeUserPassword(accessToken, passwordBody, bindingResult);
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             loginService.logout(userId);
 
         } catch (Exception exception) {
@@ -142,7 +142,7 @@ public class LoginController {
 
     @GetMapping(value = "/update-email-id", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseDTO updateUserEmailId(@RequestParam("emailId") String emailId, @RequestHeader("access-token") String accessToken) throws VerificationException, IOException {
-        String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+        String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
         ResponseDTO responseDTO = loginV2Service.updateEmailIdForUserProfile(emailId, userId, Boolean.FALSE, accessToken, null);
         if (responseDTO.getResponseCode() == Constants.TWO_HUNDRED) {
             return HttpUtils.onSuccess(null, "Please check your email to complete the new email verification process");
@@ -198,7 +198,7 @@ public class LoginController {
     @GetMapping(path = "/get-profile")
     public ResponseDTO getUserProfile(@RequestHeader("access-token") String accessToken) throws VerificationException, IOException {
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             return loginV2Service.fetchUserProfileDetail(userId, accessToken);
         } catch (Exception exception) {
             return userController.handleAccessTokenException(exception);
@@ -208,7 +208,7 @@ public class LoginController {
     @PostMapping(path = "/get-profile-from-phoneNumber")
     public ResponseDTO getUserProfileFromNumber(@RequestHeader("access-token") String accessToken, @RequestBody PhoneNumberListDTO phoneNumberDTO) {
         try {
-            KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             return loginV2Service.fetchUserProfileDetailFromPhoneNUmber(phoneNumberDTO, accessToken);
         } catch (Exception exception) {
             return userController.handleAccessTokenException(exception);
@@ -237,7 +237,7 @@ public class LoginController {
     public ResponseDTO updateUserProfile(@RequestHeader("access-token") String accessToken, @RequestBody RegistryUserWithOsId registryUser) throws VerificationException, IOException {
         ResponseDTO responseDTO = new ResponseDTO();
         try {
-            String phoneNumber = KeycloakUtil.fetchPhoneNumberFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String phoneNumber = KeycloakUtil.fetchPhoneNumberFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             UpdateUserProfileDTO updateUserProfileDTO = new UpdateUserProfileDTO();
             updateUserProfileDTO.setAccessToken(accessToken);
             LocalDateTime localDateTime = LocalDateTime.now();
@@ -267,7 +267,7 @@ public class LoginController {
     public ResponseDTO logout(@RequestHeader("access-token") String accessToken) throws IOException, VerificationException {
         ResponseDTO responseDTO = new ResponseDTO();
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             responseDTO = loginService.logout(userId);
 
         } catch (Exception exception) {
@@ -284,7 +284,7 @@ public class LoginController {
     @PostMapping(value = "/update-photo")
     public ResponseDTO updateProfilePhoto(@RequestHeader("access-token") String accessToken, @RequestParam("isRemovePhoto") boolean isRemovePhoto) {
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             return loginV2Service.updateUserProfilePhoto(userId, isRemovePhoto);
         } catch (Exception exception) {
             return userController.handleAccessTokenException(exception);

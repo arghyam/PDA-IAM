@@ -1,5 +1,6 @@
 package com.socion.backend.utils;
 
+import com.socion.backend.config.AppContext;
 import org.keycloak.RSATokenVerifier;
 import org.keycloak.common.VerificationException;
 import org.keycloak.exceptions.TokenNotActiveException;
@@ -18,12 +19,10 @@ public class KeycloakUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUtil.class);
 
-    private static String publicKeyString = "";
-
     private KeycloakUtil() {
     }
 
-    public static String fetchEmailIdFromToken(String accessToken, String baseUrl, String realm) throws VerificationException {
+    public static String fetchEmailIdFromToken(String accessToken, String baseUrl, String realm, String publicKeyString) throws VerificationException {
         try {
             PublicKey publicKey = toPublicKey(publicKeyString);
             AccessToken token = RSATokenVerifier.verifyToken(accessToken, publicKey, baseUrl + Constants.REALMS + realm);
@@ -42,7 +41,7 @@ public class KeycloakUtil {
         }
     }
 
-    public static String fetchPhoneNumberFromToken(String accessToken, String baseUrl, String realm) throws VerificationException {
+    public static String fetchPhoneNumberFromToken(String accessToken, String baseUrl, String realm,String publicKeyString) throws VerificationException {
         try {
             PublicKey publicKey = toPublicKey(publicKeyString);
             AccessToken token = RSATokenVerifier.verifyToken(accessToken, publicKey, baseUrl + Constants.REALMS + realm);
@@ -61,7 +60,7 @@ public class KeycloakUtil {
         }
     }
 
-    public static String fetchUserIdFromToken(String accessToken, String baseUrl, String realm) throws VerificationException {
+    public static String fetchUserIdFromToken(String accessToken, String baseUrl, String realm,String publicKeyString) throws VerificationException {
         try {
             PublicKey publicKey = toPublicKey(publicKeyString);
             AccessToken token = RSATokenVerifier.verifyToken(accessToken, publicKey, baseUrl + Constants.REALMS + realm);
@@ -72,7 +71,7 @@ public class KeycloakUtil {
         }
     }
 
-    public static String checkValidityOfToken(String accessToken, String baseUrl, String realm) throws VerificationException {
+    public static String checkValidityOfToken(String accessToken, String baseUrl, String realm,String publicKeyString) throws VerificationException {
         try {
             PublicKey publicKey = toPublicKey(publicKeyString);
             AccessToken token = RSATokenVerifier.verifyToken(accessToken, publicKey, baseUrl + Constants.REALMS + realm);

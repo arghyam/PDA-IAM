@@ -28,7 +28,7 @@ public class OTPUtils {
     public void sendOTP(String phoneNumber, String message) {
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(appContext.getAwsAccessKey(), appContext.getAwsSecretKey());
         AmazonSNS snsClient = AmazonSNSClientBuilder.standard()
-                .withRegion(AWSRegion.UsWest2.toString())
+                .withRegion(appContext.getAwsRegion())
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
 
         Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();

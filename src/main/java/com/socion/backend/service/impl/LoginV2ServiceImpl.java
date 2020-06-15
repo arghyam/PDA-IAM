@@ -91,7 +91,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
     public ResponseDTO register(BindingResult bindingResult, SignUpDTO signUpDTO) throws IOException {
         LOGGER.info("============================================API CALL:/Register============================================");
 
-        LOGGER.info("NAME{}:",signUpDTO.getName());
+        LOGGER.info("NAME{}:", signUpDTO.getName());
         userService.valiadtePojo(bindingResult);
         Keycloak kc = userService.getKeycloak();
         ResponseDTO response = new ResponseDTO();
@@ -128,9 +128,10 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         attributes.put(Constants.IS_USER_VALIDATED, asList(Boolean.FALSE.toString()));
 
         userRepresentation.setAttributes(attributes);
+        ObjectMapper objectMapper = new ObjectMapper();
 
         Response result = kc.realm(appContext.getRealm()).users().create(userRepresentation);
-
+        LOGGER.info(objectMapper.writeValueAsString(result));
         if (result.getStatus() != Constants.TWO_ZERO_ONE && result.getStatus() == Constants.FOUR_ZERO_NINE) {
             UserRepresentation keycloakUser = keycloakService.getUserByUsername(kc.tokenManager().getAccessTokenString(),
                     signUpDTO.getPhoneNumber(), appContext.getRealm());
@@ -200,7 +201,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         LOGGER.debug("OTP sending to : {} ", userRepresentation.getAttributes().get(Constants.PHONE_NUMBER).get(0));
         if (Constants.UPDATE_PHONE_KEYWORD.equalsIgnoreCase(typeOfOTP)) {
             try {
-                EmailUtils.sendEmail(appContext, userRepresentation.getEmail(), Constants.EMAIL_ACTION_UPDATE_PHONE, userRepresentation.getId(), userRepresentation.getFirstName(), otp,null);
+                EmailUtils.sendEmail(appContext, userRepresentation.getEmail(), Constants.EMAIL_ACTION_UPDATE_PHONE, userRepresentation.getId(), userRepresentation.getFirstName(), otp, null);
             } catch (Exception e) {
                 LOGGER.error("Error with exception", e);
             }
@@ -242,7 +243,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         userService.valiadtePojo(bindingResult);
         String phoneNumber = null;
         try {
-            phoneNumber = KeycloakUtil.fetchPhoneNumberFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            phoneNumber = KeycloakUtil.fetchPhoneNumberFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
         } catch (VerificationException e) {
             LOGGER.error(Constants.ERRORLOG, e);
         }
@@ -599,7 +600,6 @@ public class LoginV2ServiceImpl implements LoginV2Service {
                 phoneNumber, appContext.getRealm());
 
 
-
         if (keycloakUser == null || keycloakUser.getUsername() == null) {
             LOGGER.debug(Constants.USER_WITH_PHONENUMBER_NOTEXISTS);
 
@@ -785,7 +785,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
 
 
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             String adminAccesToken = keycloakService.generateAccessToken(appContext.getAdminUserName());
             UserRepresentation user = keycloakService.getUserById(" BEARER " + adminAccesToken, userId, appContext.getRealm());
 
@@ -860,7 +860,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         LOGGER.info("country code is {}", countryCode);
 
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             String adminAccessToken = keycloakService.generateAccessToken(appContext.getAdminUserName());
             if (doesUserExists(newPhoneNumber, adminAccessToken)) {
                 return HttpUtils.onFailure(HttpStatus.BAD_REQUEST.value(), Constants.USER_ALREADY_EXISTS);
@@ -923,8 +923,8 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         searchRegistryUserDto.setId(RegistryResponse.API_ID.SEARCH.getId());
         searchRegistryUserDto.setVer("1.0");
 
-        SlimRequestPhoneNumber request=new SlimRequestPhoneNumber();
-        PhoneNumberAndCountryCodeRegistryUser person=new PhoneNumberAndCountryCodeRegistryUser(phoneNumber,countryCode);
+        SlimRequestPhoneNumber request = new SlimRequestPhoneNumber();
+        PhoneNumberAndCountryCodeRegistryUser person = new PhoneNumberAndCountryCodeRegistryUser(phoneNumber, countryCode);
         request.setPerson(person);
         searchRegistryUserDto.setRequest(request);
 
@@ -972,12 +972,12 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         if (searchRegistryUser.getResult() != null && !((List<LinkedHashMap<String, Object>>) searchRegistryUser.getResult()).isEmpty()) {
             registryUserWithOsId = new RegistryUserWithOsId(((List<LinkedHashMap<String, Object>>) searchRegistryUser.getResult()).get(0));
 
-                LOGGER.debug("Retrieved User successfully with phoneNumber : {} ", registryUserWithOsId.getPhoneNumber());
-                registryUserString = HttpUtils.convertJsonObjectToString(registryUserWithOsId);
-            } else {
-                LOGGER.error("User does not exist in registry with phone number : {} ", phoneNumber);
-                throw new IOException();
-            }
+            LOGGER.debug("Retrieved User successfully with phoneNumber : {} ", registryUserWithOsId.getPhoneNumber());
+            registryUserString = HttpUtils.convertJsonObjectToString(registryUserWithOsId);
+        } else {
+            LOGGER.error("User does not exist in registry with phone number : {} ", phoneNumber);
+            throw new IOException();
+        }
 
         return registryUserWithOsId;
 
@@ -1185,13 +1185,13 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         ResponseDTO responseDTO = new ResponseDTO();
         List<PhoneNumberAndCountryCodeDTO> phoneNumbers = phoneNumberListDTO.getPhoneNumbers();
         List<Map<String, Object>> userDetails = new ArrayList<Map<String, Object>>();
-        for ( PhoneNumberAndCountryCodeDTO phoneNumber : phoneNumbers) {
+        for (PhoneNumberAndCountryCodeDTO phoneNumber : phoneNumbers) {
             try {
                 RegistryUserWithOsId searchRegistryUser = getUserFromRegistryFromNumber(phoneNumber.getCountryCode(), phoneNumber.getPhoneNumber(), accessToken);
                 Map<String, Object> userDetail = new HashMap<>();
                 userDetail.put(phoneNumber.getCountryCode().concat(phoneNumber.getPhoneNumber()), searchRegistryUser);
                 userDetails.add(userDetail);
-            }catch (IOException e){
+            } catch (IOException e) {
                 Map<String, Object> userDetail = new HashMap<>();
                 userDetail.put(phoneNumber.getCountryCode().concat(phoneNumber.getPhoneNumber()), null);
                 userDetails.add(userDetail);
@@ -1202,9 +1202,9 @@ public class LoginV2ServiceImpl implements LoginV2Service {
                 return responseDTO;
             }
         }
-            responseDTO.setResponse(userDetails);
-            responseDTO.setMessage("SuccessFully fetch user Data");
-            responseDTO.setResponseCode(org.apache.http.HttpStatus.SC_OK);
+        responseDTO.setResponse(userDetails);
+        responseDTO.setMessage("SuccessFully fetch user Data");
+        responseDTO.setResponseCode(org.apache.http.HttpStatus.SC_OK);
 
         return responseDTO;
     }
@@ -1245,12 +1245,12 @@ public class LoginV2ServiceImpl implements LoginV2Service {
 
     private RegistryUserWithOsId getUserFromRegistryByUserID(String userId, String accessToken) throws IOException {
         RegistryUserWithOsId registryUserWithOsId = new RegistryUserWithOsId();
-            SlimRegistryUserUserIdDto searchRegistryUserDto = new SlimRegistryUserUserIdDto();
-            searchRegistryUserDto.setId(RegistryResponse.API_ID.SEARCH.getId());
-            searchRegistryUserDto.setVer("1.0");
+        SlimRegistryUserUserIdDto searchRegistryUserDto = new SlimRegistryUserUserIdDto();
+        searchRegistryUserDto.setId(RegistryResponse.API_ID.SEARCH.getId());
+        searchRegistryUserDto.setVer("1.0");
 
-            RegistryUserWithUserId person = new RegistryUserWithUserId();
-            person.setUserId(userId);
+        RegistryUserWithUserId person = new RegistryUserWithUserId();
+        person.setUserId(userId);
         SlimRequestUserId request = new SlimRequestUserId();
         request.setPerson(person);
         searchRegistryUserDto.setRequest(request);
@@ -1259,7 +1259,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
 
         LOGGER.debug(Constants.REMOVE_BEARER);
         RegistryResponse searchRegistryUser = registryDao.searchUserByUserId(accessToken, searchRegistryUserDto).execute().body();
-        ObjectMapper objectMapper =new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         LOGGER.debug("Searched User from Registry with userID : {} ", userId);
 
         if (searchRegistryUser.getResult() != null && !((List<LinkedHashMap<String, Object>>) searchRegistryUser.getResult()).isEmpty()) {
@@ -1323,8 +1323,8 @@ public class LoginV2ServiceImpl implements LoginV2Service {
             String newemail = updateUserProfileDTO.getNewemail();
             String userIdForUserFetchAfterUpdate = updateUserProfileDTO.getUserId();
 
-	     if((updatedRegistryUserBody.getName().contains("?"))||(updatedRegistryUserBody.getName().contains(","))){
-                return HttpUtils.onFailure(org.apache.http.HttpStatus.SC_BAD_REQUEST,"Please Enter a valid name");
+            if ((updatedRegistryUserBody.getName().contains("?")) || (updatedRegistryUserBody.getName().contains(","))) {
+                return HttpUtils.onFailure(org.apache.http.HttpStatus.SC_BAD_REQUEST, "Please Enter a valid name");
             }
             responseDTO = updateKeycloakUser(userAccessToken, updatedRegistryUserBody, phoneNumber, isUpdatedEmailVerified, updateEmail);
             boolean isPhotoUpdated = isProfilePhotoUpdate(phoneNumber, userAccessToken, updatedRegistryUserBody);
@@ -1333,14 +1333,14 @@ public class LoginV2ServiceImpl implements LoginV2Service {
                 LOGGER.error("Error updating keycloak user");
                 return responseDTO;
             }
-            responseDTO = updateRegistryUser(userAccessToken, updatedRegistryUserBody, phoneNumber, email, isUpdatedEmailVerified, updateEmail, newemail,updateUserProfileDTO.getEmailUpdateId()==null?null:updateUserProfileDTO.getEmailUpdateId());
+            responseDTO = updateRegistryUser(userAccessToken, updatedRegistryUserBody, phoneNumber, email, isUpdatedEmailVerified, updateEmail, newemail, updateUserProfileDTO.getEmailUpdateId() == null ? null : updateUserProfileDTO.getEmailUpdateId());
             LocalDateTime dateTime = LocalDateTime.now();
 
-	    
+
             if (isNameUpdated) {
                 saveNotification(new NotificationDTO(null, updatedRegistryUserBody.getUserId(), Constants.CHANGE_NAME, NotificationEvents.USER.toString(), dateTime.toLocalDate().toString() + " " + dateTime.toLocalTime().toString(), false));
             }
-            RegistryUserWithOsId user = getUserFromRegistryByUserID(userIdForUserFetchAfterUpdate == null ? KeycloakUtil.fetchUserIdFromToken(userAccessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm()) : userIdForUserFetchAfterUpdate, userAccessToken);
+            RegistryUserWithOsId user = getUserFromRegistryByUserID(userIdForUserFetchAfterUpdate == null ? KeycloakUtil.fetchUserIdFromToken(userAccessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey()) : userIdForUserFetchAfterUpdate, userAccessToken);
             ProfileTemplateDto profileTemplateDto = new ProfileTemplateDto();
             profileTemplateDto.setUserId(user.getUserId());
             profileTemplateDto.setUserName(user.getName());
@@ -1366,7 +1366,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
 
     private ResponseDTO updateRegistryUserProfilePic(String accessToken, String profileCardUrl) {
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             RegistryUserWithOsId user = fetchUserFromRegistry(userId, accessToken);
             user.setUpdtDttm(new java.util.Date().toString());
             user.setProfileCardUrl(profileCardUrl);
@@ -1454,19 +1454,18 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         return HttpUtils.onSuccess(null, Constants.USER_UPDATE_SUCCESS_KEYCLOAK);
     }
 
-    private ResponseDTO updateRegistryUser(String accessToken, RegistryUserWithOsId updatedRegistryUserBody, String phoneNumber, String oldemailId, Boolean isUpdatedEmailIdVerified, Boolean updateEmail, String newEmail,String emailUpdateId) {
+    private ResponseDTO updateRegistryUser(String accessToken, RegistryUserWithOsId updatedRegistryUserBody, String phoneNumber, String oldemailId, Boolean isUpdatedEmailIdVerified, Boolean updateEmail, String newEmail, String emailUpdateId) {
         try {
             LOGGER.debug("Set updated values in Registry for user : {}", updatedRegistryUserBody.getEmailId());
             updatedRegistryUserBody.setUpdtDttm(new java.util.Date().toString());
             updatedRegistryUserBody.setPhoneNumber(phoneNumber);
             updatedRegistryUserBody.setSalutation("");
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             LOGGER.info("profile card Updated for user :" + userId);
             updatedRegistryUserBody.setProfileCardUrl(appContext.getAwsS3Url() + "profile-card/" + updatedRegistryUserBody.getUserId());
             RequestWithOsId request = new RequestWithOsId();
             request.setPerson(updatedRegistryUserBody);
             RegistryRequestWithOsId registryRequest = new RegistryRequestWithOsId(null, request, RegistryResponse.API_ID.UPDATE.getId());
-
 
 
             if (updateEmail) {
@@ -1487,7 +1486,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
                 CompletableFuture.runAsync(() -> {
                     try {
                         LOGGER.debug("Triggering a verification email, since email is updated from old email id : {} to new emailId : {}", oldemailId, newEmail);
-                        EmailUtils.sendEmail(appContext, newEmail, Constants.EMAIL_ACTION_UPDATE_EMAIL_ID, updatedRegistryUserBody.getUserId(), updatedRegistryUserBody.getName(), null,emailUpdateId);
+                        EmailUtils.sendEmail(appContext, newEmail, Constants.EMAIL_ACTION_UPDATE_EMAIL_ID, updatedRegistryUserBody.getUserId(), updatedRegistryUserBody.getName(), null, emailUpdateId);
                     } catch (Exception e) {
                         LOGGER.error("Error sending verification email for user {} for updating emailId.", updatedRegistryUserBody.getEmailId(), e);
                     }
@@ -1566,7 +1565,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
 
     private ResponseDTO updateRegistryUserStatus(String accessToken, boolean active) {
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             RegistryUserWithOsId user = getUserFromRegistryByUserID(userId, accessToken);
             user.setUpdtDttm(new java.util.Date().toString());
             user.setActive(active);
@@ -1596,18 +1595,18 @@ public class LoginV2ServiceImpl implements LoginV2Service {
 
 
     @Override
-    public ResponseDTO updateEmailIdForUserProfile(String newEmailId, String id, Boolean isUpdatedEmailIdVerified, String userAccessToken,String emailUpdateId) {
+    public ResponseDTO updateEmailIdForUserProfile(String newEmailId, String id, Boolean isUpdatedEmailIdVerified, String userAccessToken, String emailUpdateId) {
         LOGGER.info("============================================API CALL:/update-email-id ,update-email-id-post-verification============================================");
         String adminAccessToken = keycloakService.generateAccessToken(appContext.getAdminUserName());
         ResponseDTO responseDTO = new ResponseDTO();
         try {
             UserRepresentation user = keycloakService.getUserById(Constants.BEARER + adminAccessToken, id, appContext.getRealm());
-            if(!isUpdatedEmailIdVerified){
-                user.getAttributes().put(Constants.EMAIL_UPDATE_FLAG,asList(Boolean.TRUE.toString()));
-                user.getAttributes().put(Constants.EMAIL_UPDATE_ID,asList(UUID.randomUUID().toString()));
+            if (!isUpdatedEmailIdVerified) {
+                user.getAttributes().put(Constants.EMAIL_UPDATE_FLAG, asList(Boolean.TRUE.toString()));
+                user.getAttributes().put(Constants.EMAIL_UPDATE_ID, asList(UUID.randomUUID().toString()));
                 keycloakDao.updateUser(Constants.BEARER + adminAccessToken, id, user, appContext.getRealm()).execute();
             }
-            if((isUpdatedEmailIdVerified && user.getAttributes().get(Constants.EMAIL_UPDATE_FLAG).get(0).equalsIgnoreCase(Boolean.FALSE.toString()))||(isUpdatedEmailIdVerified && !user.getAttributes().get(Constants.EMAIL_UPDATE_ID).get(0).equalsIgnoreCase(emailUpdateId))){
+            if ((isUpdatedEmailIdVerified && user.getAttributes().get(Constants.EMAIL_UPDATE_FLAG).get(0).equalsIgnoreCase(Boolean.FALSE.toString())) || (isUpdatedEmailIdVerified && !user.getAttributes().get(Constants.EMAIL_UPDATE_ID).get(0).equalsIgnoreCase(emailUpdateId))) {
                 return HttpUtils.onFailure(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Link Expired");
             }
             String oldemail = user.getEmail();
@@ -1615,7 +1614,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
             RegistryUserWithOsId updatedRegistryUserBody = getUserFromRegistry(id, phoneNumber, adminAccessToken);
             boolean isNewEmailAdded = false;
             if (isUpdatedEmailIdVerified && user.getAttributes().get(Constants.EMAIL_UPDATE_FLAG).get(0).equalsIgnoreCase(Boolean.TRUE.toString())) {
-                user.getAttributes().put(Constants.EMAIL_UPDATE_FLAG,asList(Boolean.FALSE.toString()));
+                user.getAttributes().put(Constants.EMAIL_UPDATE_FLAG, asList(Boolean.FALSE.toString()));
                 keycloakDao.updateUser(Constants.BEARER + adminAccessToken, id, user, appContext.getRealm()).execute();
                 updatedRegistryUserBody.setEmailId(newEmailId);
                 isNewEmailAdded = isAddingNewEmail(phoneNumber, adminAccessToken, updatedRegistryUserBody);
@@ -1631,7 +1630,6 @@ public class LoginV2ServiceImpl implements LoginV2Service {
             updateUserProfileDTO.setUserId(id);
 
             updateUserProfileDTO.setEmailUpdateId(user.getAttributes().get(Constants.EMAIL_UPDATE_ID).get(0));
-
 
 
             responseDTO = updateUserProfile(updateUserProfileDTO);

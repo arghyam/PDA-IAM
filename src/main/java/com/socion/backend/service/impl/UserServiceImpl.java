@@ -593,7 +593,7 @@ public class UserServiceImpl implements UserService {
         ScanningUserDetailDto scanningUserDetailDto = new ScanningUserDetailDto();
         String emailIdOfSessionCreator = null;
         try {
-            emailIdOfSessionCreator = KeycloakUtil.fetchEmailIdFromToken(scannerAccessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            emailIdOfSessionCreator = KeycloakUtil.fetchEmailIdFromToken(scannerAccessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
         } catch (VerificationException e) {
             LOGGER.error(Constants.ERRORLOG+e);
         }

@@ -94,7 +94,7 @@ public class UserController {
     public ResponseDTO logout(@RequestHeader("access-token") String accessToken) {
         ResponseDTO responseDTO = new ResponseDTO();
         try {
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             responseDTO = loginService.logout(userId);
 
         } catch (Exception exception) {
@@ -116,9 +116,9 @@ public class UserController {
 
         ResponseDTO responseDTO = new ResponseDTO();
         try {
-            String emailId = KeycloakUtil.fetchEmailIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String emailId = KeycloakUtil.fetchEmailIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             responseDTO = userService.changeUserPassword(emailId, passwordBody);
-            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             loginService.logout(userId);
 
         } catch (Exception exception) {
@@ -151,7 +151,7 @@ public class UserController {
     public ResponseDTO getUserProfile(@RequestHeader("access-token") String accessToken){
         ResponseDTO responseDTO = new ResponseDTO();
         try {
-            String emailId = KeycloakUtil.fetchEmailIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String emailId = KeycloakUtil.fetchEmailIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             return userService.fetchUserProfileDetail(emailId, accessToken);
         } catch (Exception exception) {
             responseDTO = handleAccessTokenException(exception);
@@ -166,7 +166,7 @@ public class UserController {
         ResponseDTO responseDTO = new ResponseDTO();
         try {
             String userEmail = registryUser.getEmailId();
-            String emailId = KeycloakUtil.fetchEmailIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm());
+            String emailId = KeycloakUtil.fetchEmailIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             ResponseDTO updateUserInfo = userService.updateUserProfile(accessToken, registryUser, emailId, Boolean.FALSE);
             responseDTO.setResponse(updateUserInfo.getResponse());
             responseDTO.setMessage("SuccessFully updated user Data");

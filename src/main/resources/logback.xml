@@ -28,7 +28,7 @@
     <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
 
     <appender name="STASH-B" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>35.168.197.177:9600</destination>
+        <destination>localhost:9600</destination>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder" >
             <providers>
                 <timestamp/>
