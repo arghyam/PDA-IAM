@@ -39,7 +39,7 @@ public class AwsConfigServiceImpl implements AwsConfigService {
 
     public PutObjectResult putProfileCardObjectInAwsS3(String pathOfCertificate, String userId, AmazonS3 amazonS3) {
 
-        String bucketName = appContext.getAwsS3BucketName();
+        String bucketName = appContext.getAwsS3BucketNamePrivate();
 
         PutObjectRequest request1 = new PutObjectRequest(bucketName + "/profile-card", userId, new File(pathOfCertificate));
         ObjectMetadata metadata = new ObjectMetadata();

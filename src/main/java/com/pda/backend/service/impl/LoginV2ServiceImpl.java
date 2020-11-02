@@ -129,7 +129,6 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Response result = kc.realm(appContext.getRealm()).users().create(userRepresentation);
-        LOGGER.info(objectMapper.writeValueAsString(result));
         if (result.getStatus() != Constants.TWO_ZERO_ONE && result.getStatus() == Constants.FOUR_ZERO_NINE) {
             UserRepresentation keycloakUser = keycloakService.getUserByUsername(kc.tokenManager().getAccessTokenString(),
                     signUpDTO.getPhoneNumber(), appContext.getRealm());
@@ -1460,7 +1459,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
             updatedRegistryUserBody.setSalutation("");
             String userId = KeycloakUtil.fetchUserIdFromToken(accessToken, appContext.getKeyCloakServiceUrl(), appContext.getRealm(),appContext.getKeycloakPublickey());
             LOGGER.info("profile card Updated for user :" + userId);
-            updatedRegistryUserBody.setProfileCardUrl(appContext.getAwsS3Url() + "profile-card/" + updatedRegistryUserBody.getUserId());
+            updatedRegistryUserBody.setProfileCardUrl(appContext.getAwsS3UrlPrivate() + "profile-card/" + updatedRegistryUserBody.getUserId());
             RequestWithOsId request = new RequestWithOsId();
             request.setPerson(updatedRegistryUserBody);
             RegistryRequestWithOsId registryRequest = new RegistryRequestWithOsId(null, request, RegistryResponse.API_ID.UPDATE.getId());
