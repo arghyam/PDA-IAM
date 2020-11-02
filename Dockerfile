@@ -10,6 +10,6 @@ COPY ./src/main/resources/templates /etc/templates
 
 RUN gradle clean build -x test
 
-ENTRYPOINT ["java","-jar", "./build/libs/socion-iam-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar", "./build/libs/PDA-iam-0.0.1-SNAPSHOT.jar"]
 
 

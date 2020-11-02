@@ -25,7 +25,7 @@
     <logger name="org.springframework" level="ERROR"/>
 
 
-    <logger name="com.socion.backend" level="INFO"/>
+    <logger name="com.pda.backend" level="INFO"/>
 
     <root level="INFO" additivity="FALSE">
         <appender-ref ref="STDOUT"/>

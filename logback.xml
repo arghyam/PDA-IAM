@@ -50,7 +50,7 @@
     </appender>
 
     <logger name="org.springframework" level="ERROR"/>
-    <logger name="com.socion.backend" level="DEBUG"/>
+    <logger name="com.pda.backend" level="DEBUG"/>
 
     <root level="INFO" additivity="FALSE">
         <appender-ref ref="STDOUT"/>

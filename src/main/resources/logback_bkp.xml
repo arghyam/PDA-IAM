@@ -31,7 +31,7 @@
     <logger name="org.springframework" level="ERROR"/>
 
 
-    <logger name="com.socion.session" level="DEBUG"/>
+    <logger name="com.pda.session" level="DEBUG"/>
 
     <root level="INFO" additivity="FALSE">
         <appender-ref ref="STDOUT"/>
