@@ -326,8 +326,8 @@ public class LoginV2ServiceImpl implements LoginV2Service {
 
         userService.valiadtePojo(bindingResult);
 
-        if (!otpDto.getCountryCode().substring(1, 2).equalsIgnoreCase("+")) {
-            String countryCode = "+" + otpDto.getCountryCode().substring(1, otpDto.getCountryCode().length());
+        if (!otpDto.getCountryCode().substring(0, 1).equalsIgnoreCase("+")) {
+            String countryCode = "+" + otpDto.getCountryCode().substring(0, otpDto.getCountryCode().length());
             otpDto.setCountryCode(countryCode);
         }
 

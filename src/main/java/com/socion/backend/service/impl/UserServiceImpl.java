@@ -59,6 +59,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
 import static java.util.Arrays.asList;
 
@@ -182,7 +184,15 @@ public class UserServiceImpl implements UserService {
                 .username(appContext.getAdminUserName())
                 .password(appContext.getAdminUserpassword())
                 .clientId(appContext.getClientId())
-                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(Constants.TEN).build())
+		.clientSecret(appContext.getClientSecret())
+                .grantType(appContext.getGrantType())
+                .resteasyClient(new ResteasyClientBuilder().hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        //TODO: Make this more restrictive
+                        return true;
+                    }
+                }).connectionPoolSize(Constants.TEN).build())
                 .build();
     }
 

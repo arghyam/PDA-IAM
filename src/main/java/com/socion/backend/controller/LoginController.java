@@ -29,6 +29,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping(value = "api/v2/user", produces = {"application/json", "application/x-www-form-urlencoded"})
@@ -159,21 +167,33 @@ public class LoginController {
         LOGGER.info("EMAIL TIME{}", decryptedDateTime);
         LOGGER.info("CURRENT TIME:{}", LocalDateTime.now().toString());
         if (LocalDateTime.now().minusMinutes(10l).isAfter(LocalDateTime.parse(decryptedDateTime))) {
-            File htmlTemplateFile = new File(appContext.getEmailUpdateUnSuccessFul());
-            String htmlString = FileUtils.readFileToString(htmlTemplateFile, "UTF-8");
+            Resource resource = new ClassPathResource(appContext.getEmailUpdateUnSuccessFul());
+            InputStream input = resource.getInputStream();
+            String htmlString = new BufferedReader(
+                    new InputStreamReader(input, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
             htmlString = htmlString.replace("$error", "Link expired");
             return htmlString;
         }
         ResponseDTO responseDTO = loginV2Service.updateEmailIdForUserProfile(emailId, userId, Boolean.TRUE, null, emailUpdateId);
         if (responseDTO.getResponseCode() == Constants.TWO_HUNDRED) {
             RegistryUserWithOsId registryUserWithOsId = getUserById(userId);
-            File htmlTemplateFile = new File(appContext.getEmailUpdateSuccess());
-            String htmlString = FileUtils.readFileToString(htmlTemplateFile, "UTF-8");
+            Resource resource = new ClassPathResource(appContext.getEmailUpdateSuccess());
+            InputStream input = resource.getInputStream();
+            String htmlString = new BufferedReader(
+                    new InputStreamReader(input, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
             htmlString = htmlString.replace("$name", registryUserWithOsId.getName());
             return htmlString;
         } else {
-            File htmlTemplateFile = new File(appContext.getEmailUpdateUnSuccessFul());
-            String htmlString = FileUtils.readFileToString(htmlTemplateFile, "UTF-8");
+            Resource resource = new ClassPathResource(appContext.getEmailUpdateUnSuccessFul());
+            InputStream input = resource.getInputStream();
+            String htmlString = new BufferedReader(
+                    new InputStreamReader(input, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
             htmlString = htmlString.replace("$error", responseDTO.getMessage());
             return htmlString;
         }

@@ -18,6 +18,13 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Properties;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 public class EmailUtils {
 
@@ -64,7 +71,12 @@ public class EmailUtils {
                     appContext.getSecretKey(), LocalDateTime.now().toString());
 
             try {
-                String emailContent = new String(Files.readAllBytes(Paths.get(appContext.getEmailTemplatePath())));
+                Resource resource = new ClassPathResource(appContext.getEmailTemplatePath());
+                InputStream input = resource.getInputStream();
+                String emailContent = new BufferedReader(
+                        new InputStreamReader(input, StandardCharsets.UTF_8))
+                        .lines()
+                        .collect(Collectors.joining("\n"));
                 String url = appContext.getServerUrl() + Constants.USER_EMAIL_UPDATE_V2 + emailId + '&' + "userId=" + userId+'&'+"date="+encryptedDateTime+'&'+"emailUpdateId="+emailUpdateId;
 
                 emailContent = emailContent.replace("$url", url);
@@ -79,7 +91,12 @@ public class EmailUtils {
 
         } else if (Constants.EMAIL_ACTION_UPDATE_PHONE.equals(action)) {
             LOGGER.debug("Verification email sent for user : {} ", emailId);
-            String emailContent = new String(Files.readAllBytes(Paths.get(appContext.getEmailTemplatePathPhoneUpdate())));
+            Resource resource = new ClassPathResource(appContext.getEmailTemplatePathPhoneUpdate());
+            InputStream input = resource.getInputStream();
+            String emailContent = new BufferedReader(
+                    new InputStreamReader(input, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
 
             emailContent = emailContent.replace("$otp", otp);
             emailContent = emailContent.replace("$name", name);

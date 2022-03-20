@@ -7,6 +7,11 @@ ADD ./gradlew gradlew
 ADD ./gradlew.bat    gradlew.bat
 ADD ./settings.gradle    settings.gradle
 COPY ./src/main/resources/templates /etc/templates
+USER root
+COPY keycloak.crt $JAVA_HOME/jre/lib/security
+RUN \
+    cd $JAVA_HOME/jre/lib/security \
+    && keytool -keystore cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias keycloakcert -file keycloak.crt
 
 RUN gradle clean build -x test
 
