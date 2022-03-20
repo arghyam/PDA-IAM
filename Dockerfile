@@ -1,5 +1,6 @@
 FROM gradle:4.10.2-jdk8-alpine
 
+ENV KEYSTORE_PASS
 ADD ./src src
 ADD ./gradle/wrapper gradle/wrapper
 ADD ./build.gradle   build.gradle
@@ -11,7 +12,7 @@ USER root
 COPY keycloak.crt $JAVA_HOME/jre/lib/security
 RUN \
     cd $JAVA_HOME/jre/lib/security \
-    && keytool -keystore cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias keycloakcert -file keycloak.crt
+    && keytool -keystore cacerts -storepass $KEYSTORE_PASS -noprompt -trustcacerts -importcert -alias keycloakcert -file keycloak.crt
 
 RUN gradle clean build -x test
 
