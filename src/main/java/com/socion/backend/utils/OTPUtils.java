@@ -28,6 +28,7 @@ public class OTPUtils {
     public void sendOTP(String phoneNumber, String message) {
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(appContext.getAwsAccessKey(), appContext.getAwsSecretKey());
         AmazonSNS snsClient = AmazonSNSClientBuilder.standard()
+            // AWS region was hard coded here to UsWest2 .It had to be replaced with ap-south-1.
                 .withRegion("ap-south-1")
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
 
