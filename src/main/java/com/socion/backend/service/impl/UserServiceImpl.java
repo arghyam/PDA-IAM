@@ -621,3 +621,9 @@ public class UserServiceImpl implements UserService {
     }
 
 }
+
+/** 2 changes are present here
+* 1. Skipping hostname verification(Refer to similar change in src/main/java/com/socion/entity/config/ServiceConfiguration.java) - This is a temporary change since we haven’t enabled SSL for the backend services. 
+*    This change can be skipped if we have a valid hostname with a signed certificate for each backend service
+* 2. Adding the client secret and grant type while authenticating towards keycloak.
+/*
