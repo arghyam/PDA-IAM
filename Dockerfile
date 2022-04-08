@@ -12,4 +12,4 @@ RUN gradle clean build -x test
 
 ENTRYPOINT ["java","-jar", "./build/libs/socion-iam-0.0.1-SNAPSHOT.jar"]
 
-
+# This change includes adding the SSL certificate for keycloak to JAVA keystore in order to connect to keycloak.
