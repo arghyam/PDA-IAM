@@ -325,7 +325,7 @@ public class LoginV2ServiceImpl implements LoginV2Service {
         LOGGER.info("otp country code from the dto is {}", otpDto.getCountryCode());
 
         userService.valiadtePojo(bindingResult);
-
+// Country code validation was incorrect and this is to fix it.
         if (!otpDto.getCountryCode().substring(0, 1).equalsIgnoreCase("+")) {
             String countryCode = "+" + otpDto.getCountryCode().substring(0, otpDto.getCountryCode().length());
             otpDto.setCountryCode(countryCode);
