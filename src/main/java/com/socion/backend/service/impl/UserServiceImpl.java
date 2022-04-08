@@ -59,6 +59,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+/** Skipping hostname verification(Refer to similar change in
+* src/main/java/com/socion/entity/config/ServiceConfiguration.java) - This is a temporary change since we haven’t
+* enabled SSL for the backend services. This change can be skipped if we have a valid hostname with a signed certificate for each backend service.
+/*
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
@@ -184,6 +188,7 @@ public class UserServiceImpl implements UserService {
                 .username(appContext.getAdminUserName())
                 .password(appContext.getAdminUserpassword())
                 .clientId(appContext.getClientId())
+		// Adding the client secret and grant type while authenticating towards keycloak.
 		.clientSecret(appContext.getClientSecret())
                 .grantType(appContext.getGrantType())
                 .resteasyClient(new ResteasyClientBuilder().hostnameVerifier(new HostnameVerifier() {
