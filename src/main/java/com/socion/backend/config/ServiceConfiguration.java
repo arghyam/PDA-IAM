@@ -53,3 +53,5 @@ public class ServiceConfiguration {
 
 
 }
+/* This is a temporary change since we haven’t enabled SSL for the backend services. 
+This change can be skipped if we have a valid hostname with a signed certificate for each backend service. */
