@@ -42,3 +42,5 @@ public class OTPUtils {
         LOGGER.info(result.getMessageId());
     }
 }
+
+// AWS region was hard coded here to UsWest2 .It had to be replaced with ap-south-1.
