@@ -8,6 +8,7 @@ ADD ./gradlew gradlew
 ADD ./gradlew.bat    gradlew.bat
 ADD ./settings.gradle    settings.gradle
 COPY ./src/main/resources/templates /etc/templates
+# This change includes adding the SSL certificate for keycloak to JAVA keystore in order to connect to keycloak.
 USER root
 COPY keycloak.crt $JAVA_HOME/jre/lib/security
 RUN \
