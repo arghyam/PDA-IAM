@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
+//  Reading the email templates failed since they couldn’t be accessed at runtime. This change is to fix this.
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import java.io.BufferedReader;
