@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+/* This is a temporary change since we haven’t enabled SSL for the backend services. 
+This change can be skipped if we have a valid hostname with a signed certificate for each backend service. */
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import java.util.concurrent.TimeUnit;
